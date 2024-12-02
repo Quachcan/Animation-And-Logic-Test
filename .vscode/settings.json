@@ -53,6 +53,17 @@
     },
     "dotnet.defaultSolution": "Animation and Logic Test.sln",
     "cSpell.words": [
-        "Cinemachine"
+        "atack",
+        "Chọn",
+        "Cinemachine",
+        "damge",
+        "ngẫu",
+        "nhật",
+        "nhiên",
+        "phản",
+        "Referrences"
+    ],
+    "cSpell.ignoreWords": [
+        "Windown"
     ]
 }

@@ -53,7 +53,7 @@ public class PlayerCombat : MonoBehaviour
     private void Update()
     {
         HandleAttack();
-        HandleDeflect();
+        HandleDefense();
 
         if (Time.time - lastAttackTime > comboResetTime && currentCombo > 0)
         {
@@ -105,144 +105,193 @@ public class PlayerCombat : MonoBehaviour
         currentCombo = 0;
     }
 
+    // private void DealDamage()
+    // {
+
+    //     Collider[] hitEnemies = Physics.OverlapSphere(sword.transform.position, attackRange, whatIsEnemy);
+
+    //     //Debug.Log($"Enemy in range: {hitEnemies.Length}");
+    //     HashSet<IDamageable> damagedTargets = new HashSet<IDamageable>();
+
+    //     foreach (Collider target in hitEnemies)
+    //     {
+    //         IDamageable damageable = target.GetComponentInParent<IDamageable>();
+    //         if (damageable != null && !damagedTargets.Contains(damageable))
+    //         {
+    //             damagedTargets.Add(damageable);
+
+    //             damageable.NotifyDamageTaken(attackDamage);
+    //             //Debug.Log($"Dealt {attackDamage} damge to {target.name}");
+    //         }
+    //         else
+    //         {
+    //             //Debug.Log($"No EnemyHealth script found on {target.name}");
+    //         }
+    //     }
+    // }
+
     private void DealDamage()
+{
+    Ray ray = new Ray(sword.transform.position, transform.forward);
+    RaycastHit[] hits = Physics.RaycastAll(ray, attackRange, whatIsEnemy);
+
+    foreach (RaycastHit hit in hits)
     {
-
-        Collider[] hitEnemies = Physics.OverlapSphere(sword.transform.position, attackRange, whatIsEnemy);
-
-        //Debug.Log($"Enemy in range: {hitEnemies.Length}");
-        HashSet<IDamageable> damagedTargets = new HashSet<IDamageable>();
-
-        foreach (Collider target in hitEnemies)
+        IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+        if (damageable != null)
         {
-            IDamageable damageable = target.GetComponentInParent<IDamageable>();
-            if (damageable != null && !damagedTargets.Contains(damageable))
-            {
-                damagedTargets.Add(damageable);
-
-                damageable.NotifyDamageTaken(attackDamage);
-                //Debug.Log($"Dealt {attackDamage} damge to {target.name}");
-            }
-            else
-            {
-                //Debug.Log($"No EnemyHealth script found on {target.name}");
-            }
+            damageable.NotifyDamageTaken(attackDamage);
+            Debug.Log($"Dealt {attackDamage} damage to {hit.collider.name}");
         }
     }
 
-    private void HandleDeflect()
+    if (hits.Length == 0)
     {
-        if(Input.GetKeyDown(deflectKey) && canDeflect)
-        {
-            StartCoroutine(PerformDeflect());
-        }
+        Debug.Log("No enemies hit.");
     }
-
-    private IEnumerator PerformDeflect()
-    {
-        canDeflect = false;
-
-        animator.SetBool("Deflect", true);
-
-        float elpapsedTime = 0f;
-        bool deflectSuccess = false;
-
-        while (elpapsedTime < deflectWindown)
-        {
-            if (CheckForEnemyAttack())
-            {
-                deflectSuccess = true;
-                break;
-            }
-            elpapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        if (deflectSuccess)
-        {
-            SuccessDeflect();
-        }
-        else
-        {
-            FailedDeflect();
-        }
-
-        yield return new WaitForSeconds(deflectCoolDown);
-        canDeflect = true;
-    }
-
-    private bool CheckForEnemyAttack()
-    {
-        //Check for enemy atack states.    
-        return Random.Range(0, 100) < 10;
-    }
-
-    private void SuccessDeflect()
-    {
-        //Todo: Deal posture damage for enemy
-        int parryIndex = Random.Range(0, 3);
-        animationManager.SetParryIndex(parryIndex);  
-
-        if (deflectEffect != null)
-        {
-            //Effect for deflect
-        }
-        // audio for deflect 
-    }
-
-    private void FailedDeflect()
-    {
-        Debug.Log("Parry Failed");
-        animationManager.PlayDefenseHit();
-        // TODO:  Player take damage
-    }
+}
 
     private void HandleDefense()
     {
-        if (Input.GetMouseButtonDown(1)) 
+        if (Input.GetMouseButtonDown(1)) // Right Mouse Button
         {
             StartDefense();
         }
 
-        if (Input.GetMouseButton(1)) 
+        if (Input.GetMouseButton(1)) // Hold defense
         {
-            if (isInParryWindow)
+            if (isDefending && !isInParryWindow)
             {
-                animationManager.SetActionState(1); 
+                PlayDefenseLoop();
             }
         }
 
-        if (Input.GetMouseButtonUp(1)) 
+        if (Input.GetMouseButtonUp(1)) // Release defense
         {
             EndDefense();
-        }
-
-        if (Time.time - defenseStartTime < parryWindowDuration && !isInParryWindow)
-        {
-            isInParryWindow = true;
-            int parryIndex = Random.Range(0, 3); // Chọn ngẫu nhiên phản ứng parry
-            animationManager.SetParryIndex(parryIndex);  // Cập nhật ParryIndex
-            animationManager.TriggerParryReaction();
         }
     }
 
     private void StartDefense()
     {
+        if (isDefending) return;
+
+        isDefending = true;
+        isInParryWindow = true; // Enable parry window
         defenseStartTime = Time.time;
+
+        animationManager.SetBool("IsDefending", true);
+        animationManager.PlayTrigger("DefenseStart");
+
+        // Start parry window timer
+        StartCoroutine(HandleParryWindow());
+    }
+
+    private IEnumerator HandleParryWindow()
+    {
+        yield return new WaitForSeconds(parryWindowDuration);
         isInParryWindow = false;
-        animationManager.SetActionState(0);  // DefenseStart
-        animationManager.TriggerDefenseStart();
+    }
+
+    private void PlayDefenseLoop()
+    {
+        animationManager.PlayTrigger("DefenseLoop");
     }
 
     private void EndDefense()
     {
-        animationManager.SetActionState(2);  // Kết thúc DefenseLoop
-        animationManager.TriggerDefenseLoop();
+        isDefending = false;
+        animationManager.StopDefense(); // Stop all defense animations
+    }
+
+    public void TryParry(bool enemyAttackDetected)
+    {
+        if (!isDefending) return;
+
+        if (isInParryWindow && enemyAttackDetected)
+        {
+            SuccessParry();
+        }
+        else if (enemyAttackDetected)
+        {
+            FailParry();
+        }
+    }
+
+
+
+    private void SuccessParry()
+    {
+        int parryIndex = Random.Range(0, 3); // Choose one of three parry animations
+        animationManager.SetParryIndex(parryIndex);
+        animationManager.TriggerParryReaction();
+
+        if (deflectEffect != null)
+        {
+            Instantiate(deflectEffect, transform.position, Quaternion.identity);
+        }
+
+        Debug.Log("Parry Successful!");
+    }
+
+    private void FailParry()
+    {
+        animationManager.PlayTrigger("DefenseHit");
+        Debug.Log("Parry Failed! Playing Defend Hit Animation.");
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(sword.transform.position, attackRange);
+        // Gizmos.color = Color.red;
+        // Gizmos.DrawWireSphere(sword.transform.position, attackRange);
+        // Gizmos.color = Color.red;
+
+    Gizmos.color = Color.red;
+
+    // Gốc của Ray
+    Vector3 rayOrigin = sword.transform.position;
+
+    // Hướng chính diện
+    Vector3 centralDirection = transform.forward;
+
+    // Góc lệch (để tạo ray trái và phải)
+    float sideAngle = 30f; // Góc lệch 30 độ
+
+    // Tính toán hướng ray lệch
+    Vector3 leftDirection = Quaternion.Euler(0, -sideAngle, 0) * transform.forward;
+    Vector3 rightDirection = Quaternion.Euler(0, sideAngle, 0) * transform.forward;
+
+    // Vẽ Ray chính diện
+    Gizmos.DrawRay(rayOrigin, centralDirection * attackRange);
+
+    // Vẽ Ray lệch trái
+    Gizmos.DrawRay(rayOrigin, leftDirection * attackRange);
+
+    // Vẽ Ray lệch phải
+    Gizmos.DrawRay(rayOrigin, rightDirection * attackRange);
+
+    // Debug: kiểm tra va chạm với kẻ địch trên từng ray
+    RaycastHit hit;
+
+    // Kiểm tra Ray chính diện
+    if (Physics.Raycast(rayOrigin, centralDirection, out hit, attackRange, whatIsEnemy))
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
+    }
+
+    // Kiểm tra Ray lệch trái
+    if (Physics.Raycast(rayOrigin, leftDirection, out hit, attackRange, whatIsEnemy))
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
+    }
+
+    // Kiểm tra Ray lệch phải
+    if (Physics.Raycast(rayOrigin, rightDirection, out hit, attackRange, whatIsEnemy))
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
+    }
     }
 }

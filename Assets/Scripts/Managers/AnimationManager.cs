@@ -70,10 +70,11 @@
 
     // Stop defense loop
         public void StopDefense()
-        {
-            SetActionState(2);
-            ResetTrigger("DefenseLoop");
-            SetBool("IsDefending", false);
-        }
+    {
+        ResetTrigger("DefenseStart");
+        ResetTrigger("DefenseLoop");
+        ResetTrigger("DefenseHit");
+        SetBool("IsDefending", false);
+    }
 
     }
