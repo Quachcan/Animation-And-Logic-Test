@@ -246,52 +246,41 @@ public class PlayerCombat : MonoBehaviour
         // Gizmos.DrawWireSphere(sword.transform.position, attackRange);
         // Gizmos.color = Color.red;
 
-    Gizmos.color = Color.red;
+        Gizmos.color = Color.red;
 
-    // Gốc của Ray
-    Vector3 rayOrigin = sword.transform.position;
+        Vector3 rayOrigin = sword.transform.position;
 
-    // Hướng chính diện
-    Vector3 centralDirection = transform.forward;
+        Vector3 centralDirection = transform.forward;
 
-    // Góc lệch (để tạo ray trái và phải)
-    float sideAngle = 30f; // Góc lệch 30 độ
+        float sideAngle = 30f;
 
-    // Tính toán hướng ray lệch
-    Vector3 leftDirection = Quaternion.Euler(0, -sideAngle, 0) * transform.forward;
-    Vector3 rightDirection = Quaternion.Euler(0, sideAngle, 0) * transform.forward;
+        Vector3 leftDirection = Quaternion.Euler(0, -sideAngle, 0) * transform.forward;
+        Vector3 rightDirection = Quaternion.Euler(0, sideAngle, 0) * transform.forward;
 
-    // Vẽ Ray chính diện
-    Gizmos.DrawRay(rayOrigin, centralDirection * attackRange);
+        Gizmos.DrawRay(rayOrigin, centralDirection * attackRange);
 
-    // Vẽ Ray lệch trái
-    Gizmos.DrawRay(rayOrigin, leftDirection * attackRange);
+        Gizmos.DrawRay(rayOrigin, leftDirection * attackRange);
 
-    // Vẽ Ray lệch phải
-    Gizmos.DrawRay(rayOrigin, rightDirection * attackRange);
+        Gizmos.DrawRay(rayOrigin, rightDirection * attackRange);
 
-    // Debug: kiểm tra va chạm với kẻ địch trên từng ray
-    RaycastHit hit;
+        RaycastHit hit;
 
-    // Kiểm tra Ray chính diện
-    if (Physics.Raycast(rayOrigin, centralDirection, out hit, attackRange, whatIsEnemy))
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
-    }
+        if (Physics.Raycast(rayOrigin, centralDirection, out hit, attackRange, whatIsEnemy))
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
+        }
 
-    // Kiểm tra Ray lệch trái
-    if (Physics.Raycast(rayOrigin, leftDirection, out hit, attackRange, whatIsEnemy))
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
-    }
+        if (Physics.Raycast(rayOrigin, leftDirection, out hit, attackRange, whatIsEnemy))
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
+        }
 
-    // Kiểm tra Ray lệch phải
-    if (Physics.Raycast(rayOrigin, rightDirection, out hit, attackRange, whatIsEnemy))
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
-    }
-    }
+        if (Physics.Raycast(rayOrigin, rightDirection, out hit, attackRange, whatIsEnemy))
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
+        }
+        }
 }
