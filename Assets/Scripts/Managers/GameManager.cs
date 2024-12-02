@@ -94,13 +94,11 @@ public class GameManager : MonoBehaviour
         if (target != null)
         {
             target.TakeDamage(amount);
-
         }
         else
         {
             Debug.LogError("ProcessingDamage : Target is null");
         }
-
 
         if (target is PlayerHealth player)
         {

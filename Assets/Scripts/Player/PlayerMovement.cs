@@ -157,7 +157,7 @@ public class PlayerMovement : MonoBehaviour
     Vector3 targetPosition = startPosition + dodgeDirection * dodgeDistance;
 
     // Sync dodge movement to animation duration
-    float dodgeDuration = animator.GetCurrentAnimatorStateInfo(0).length; // Assumes the dodge animation is on Layer 0
+    float dodgeDuration = animator.GetCurrentAnimatorStateInfo(0).length;
     float elapsedTime = 0f;
 
     while (elapsedTime < dodgeDuration)

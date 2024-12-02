@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,6 +18,12 @@ public class PlayerCombat : MonoBehaviour
     private float lastAttackTime;
     private List<string> comboTriggers = new List<string> { "Attack_1", "Attack_2", "Attack_3" };
 
+    [Header("Defend System")]
+    private bool isInParryWindow;
+    private float defenseStartTime;
+    private float parryWindowDuration = 0.5f;
+    private bool isDefending = false;
+
     [Header("Parry System")]
     private bool canDeflect = true;
     public float deflectCoolDown = 0.1f;
@@ -35,9 +41,13 @@ public class PlayerCombat : MonoBehaviour
     [Header("Referrences")]
     public GameObject sword;
 
+    [Header("Components")]
+    private AnimationManager animationManager;
+
     private void Awake()
     {
         animator = GetComponentInChildren<Animator>();
+        animationManager = new AnimationManager(animator);
     }
 
     private void Update()
@@ -170,6 +180,8 @@ public class PlayerCombat : MonoBehaviour
     private void SuccessDeflect()
     {
         //Todo: Deal posture damage for enemy
+        int parryIndex = Random.Range(0, 3);
+        animationManager.SetParryIndex(parryIndex);  
 
         if (deflectEffect != null)
         {
@@ -181,7 +193,51 @@ public class PlayerCombat : MonoBehaviour
     private void FailedDeflect()
     {
         Debug.Log("Parry Failed");
+        animationManager.PlayDefenseHit();
         // TODO:  Player take damage
+    }
+
+    private void HandleDefense()
+    {
+        if (Input.GetMouseButtonDown(1)) 
+        {
+            StartDefense();
+        }
+
+        if (Input.GetMouseButton(1)) 
+        {
+            if (isInParryWindow)
+            {
+                animationManager.SetActionState(1); 
+            }
+        }
+
+        if (Input.GetMouseButtonUp(1)) 
+        {
+            EndDefense();
+        }
+
+        if (Time.time - defenseStartTime < parryWindowDuration && !isInParryWindow)
+        {
+            isInParryWindow = true;
+            int parryIndex = Random.Range(0, 3); // Chọn ngẫu nhiên phản ứng parry
+            animationManager.SetParryIndex(parryIndex);  // Cập nhật ParryIndex
+            animationManager.TriggerParryReaction();
+        }
+    }
+
+    private void StartDefense()
+    {
+        defenseStartTime = Time.time;
+        isInParryWindow = false;
+        animationManager.SetActionState(0);  // DefenseStart
+        animationManager.TriggerDefenseStart();
+    }
+
+    private void EndDefense()
+    {
+        animationManager.SetActionState(2);  // Kết thúc DefenseLoop
+        animationManager.TriggerDefenseLoop();
     }
 
     private void OnDrawGizmos()

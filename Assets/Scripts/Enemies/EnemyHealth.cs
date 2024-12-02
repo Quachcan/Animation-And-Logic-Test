@@ -9,16 +9,18 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     public float maxPostureHealth;
     public float currentHealth;
     private float currentPostureHealth;
+
+    private Animator animator;
     // Start is called before the first frame update
     void Start()
     {
+        animator = GetComponentInChildren<Animator>();
         currentHealth = maxHealth;
         currentPostureHealth = maxPostureHealth;
     }
 
     public void TakeDamage(float amount)
     {
-        
         currentHealth -= amount/1.5f;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         currentPostureHealth -= amount;
@@ -39,6 +41,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     private void Die()
     {
         //Todo: Die effect
+        animator.SetTrigger("Dead");
     }
 
 }

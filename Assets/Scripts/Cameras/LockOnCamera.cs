@@ -4,14 +4,14 @@ using Cinemachine;
 public class LockOnCamera : MonoBehaviour
 {
     [Header("Cinemachine Cameras")]
-    public CinemachineFreeLook freeLookCamera; // Default FreeLook camera
-    public CinemachineVirtualCamera lockOnCamera; // Dedicated lock-on camera
+    public CinemachineFreeLook freeLookCamera; 
+    public CinemachineVirtualCamera lockOnCamera; 
 
     [Header("Lock-On Settings")]
-    public Transform player; // Player transform
-    public Transform target; // Current lock-on target
-    public float lockOnDistance = 15f; // Maximum distance to lock on
-    public KeyCode lockOnKey = KeyCode.Q; // Key to toggle lock-on mode
+    public Transform player; 
+    public Transform target; 
+    public float lockOnDistance = 15f; 
+    public KeyCode lockOnKey = KeyCode.Q; 
 
     private bool isLockedOn = false;
 
@@ -30,13 +30,11 @@ public class LockOnCamera : MonoBehaviour
         if (Input.GetKeyDown(lockOnKey))
         {
             if (isLockedOn)
-            {
-                // Turn off lock-on mode
+            {              
                 DisableLockOn();
             }
             else
             {
-                // Find and lock onto the nearest target
                 FindTarget();
             }
         }
@@ -94,25 +92,21 @@ public class LockOnCamera : MonoBehaviour
             lockOnCamera.gameObject.SetActive(false);
             freeLookCamera.gameObject.SetActive(true);
 
-            target = null; // Clear the lock-on target
+            target = null; 
         }
     }
 
     private void RotatePlayerTowardTarget()
 {
-    // Calculate direction to the target
     Vector3 direction = (target.position - player.position).normalized;
 
-    // Ignore Y-axis for a flat rotation
     direction.y = 0;
 
     float angle = Vector3.Angle(player.forward, direction);
     if (angle < 1f) return;
 
-    // Calculate the target rotation
     Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-    // Smoothly rotate the player towards the target
     player.rotation = Quaternion.Slerp(player.rotation, targetRotation, Time.deltaTime * 10f);
 }
 }
