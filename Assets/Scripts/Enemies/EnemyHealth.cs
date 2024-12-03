@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     public float maxPostureHealth;
     public float currentHealth;
     private float currentPostureHealth;
+
 
     private Animator animator;
     // Start is called before the first frame update
@@ -42,6 +44,11 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     {
         //Todo: Die effect
         animator.SetTrigger("Dead");
+        Invoke(nameof(DestroyGameObject), 2f);
     }
 
+    private void DestroyGameObject()
+    {
+        Destroy(gameObject);
+    }
 }

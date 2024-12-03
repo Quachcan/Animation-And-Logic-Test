@@ -15,14 +15,28 @@ public class LockOnCamera : MonoBehaviour
 
     private bool isLockedOn = false;
 
+    private EnemyHealth enemy;
+
     private void Update()
     {
         HandleLockOnInput();
 
-        if (isLockedOn && target != null)
+        if (isLockedOn)
         {
-            RotatePlayerTowardTarget(); 
+            if (target == null)
+            {
+                DisableLockOn();
+                return;
+            }
+            if (Vector3.Distance(player.position, target.position) > lockOnDistance)
+            {
+                DisableLockOn();
+                return;
+            }
+
+            RotatePlayerTowardTarget();
         }
+
     }
 
     private void HandleLockOnInput()
@@ -79,7 +93,13 @@ public class LockOnCamera : MonoBehaviour
 
             // Set the lock-on target for the lock-on camera
             lockOnCamera.LookAt = target;
+
         }
+    }
+
+        private void HandleEnemyDeath()
+    {
+        DisableLockOn();
     }
 
     private void DisableLockOn()
@@ -93,20 +113,22 @@ public class LockOnCamera : MonoBehaviour
             freeLookCamera.gameObject.SetActive(true);
 
             target = null; 
+
         }
     }
 
-    private void RotatePlayerTowardTarget()
-{
-    Vector3 direction = (target.position - player.position).normalized;
+        private void RotatePlayerTowardTarget()
+    {
+        if (target == null) return;
 
-    direction.y = 0;
+        Vector3 direction = (target.position - player.position).normalized;
+        direction.y = 0; // Keep the rotation on the horizontal plane
 
-    float angle = Vector3.Angle(player.forward, direction);
-    if (angle < 1f) return;
+        if (direction.magnitude > 0.01f) // Check if there's significant direction to rotate towards
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            player.rotation = Quaternion.Lerp(player.rotation, targetRotation, Time.deltaTime * 5f); // Reduce the rotation speed for smoother transitions
+        }
+    }
 
-    Quaternion targetRotation = Quaternion.LookRotation(direction);
-
-    player.rotation = Quaternion.Slerp(player.rotation, targetRotation, Time.deltaTime * 10f);
-}
 }

@@ -6,9 +6,16 @@ public class EnemyCombat : MonoBehaviour
 {
     [Header("Combo Attacks")]
     public List<Combo> combos; 
+    private float lastComboTime;
+
+    [Header("Combat Setting")]
+    public float attackDamage;
+    public float attackRange;
+    public LayerMask whatIsPlayer;
+
+    public GameObject sword;
 
     private Animator animator;
-    private float lastComboTime;
 
     private void Start()
     {
@@ -17,6 +24,29 @@ public class EnemyCombat : MonoBehaviour
         PerformRandomCombo();
     }
 
+    private void DealDamage()
+    {
+        Collider[] hitPlayer = Physics.OverlapSphere(sword.transform.position, attackRange, whatIsPlayer);
+        Debug.Log($"Player in range: {hitPlayer.Length}");
+
+        HashSet<IDamageable> damagedTarget = new HashSet<IDamageable>();
+
+        foreach (Collider target in hitPlayer)
+        {
+            IDamageable damageable = target.GetComponentInParent<IDamageable>();
+            if (damageable != null && !damagedTarget.Contains(damageable))
+            {
+                damagedTarget.Add(damageable);
+
+                damageable.NotifyDamageTaken(attackRange);
+                Debug.Log($"Dealt {attackDamage} damage to {target.name}");
+            }
+            else 
+            {
+                Debug.Log($"No PlayerHealth script found on {target.name}");
+            }
+        }
+    }
 
     public void PerformRandomCombo()
     {
@@ -45,5 +75,12 @@ public class EnemyCombat : MonoBehaviour
         }
 
         yield return new WaitForSeconds(combo.comboCoolDownTime);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(sword.transform.position, attackRange);
+        Gizmos.color = Color.green;
     }
 }

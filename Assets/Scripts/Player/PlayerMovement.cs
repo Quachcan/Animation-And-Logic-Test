@@ -139,44 +139,44 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private IEnumerator PerformDodge()
-{
-    isDodging = true;
-    isInvincible = true;
-
-    animator.SetTrigger("Dodge");
-
-    // Determine the dodge direction (default to forward if no input)
-    Vector3 dodgeDirection = (orientation.forward * verticalInput + orientation.right * horizontalInput).normalized;
-    if (dodgeDirection == Vector3.zero)
     {
-        dodgeDirection = transform.forward; // Default to forward if no input
+        isDodging = true;
+        isInvincible = true;
+
+        animator.SetTrigger("Dodge");
+
+        // Determine the dodge direction (default to forward if no input)
+        Vector3 dodgeDirection = (orientation.forward * verticalInput + orientation.right * horizontalInput).normalized;
+        if (dodgeDirection == Vector3.zero)
+        {
+            dodgeDirection = transform.forward; // Default to forward if no input
+        }
+
+        // Calculate dodge target position
+        Vector3 startPosition = transform.position;
+        Vector3 targetPosition = startPosition + dodgeDirection * dodgeDistance;
+
+        // Sync dodge movement to animation duration
+        float dodgeDuration = animator.GetCurrentAnimatorStateInfo(0).length;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < dodgeDuration)
+        {
+            // Lerp position for smooth movement
+            float progress = elapsedTime / dodgeDuration;
+            transform.position = Vector3.Lerp(startPosition, targetPosition, progress);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Finalize position and reset states
+        transform.position = targetPosition;
+        isDodging = false;
+
+        yield return new WaitForSeconds(dodgeDuration * 0.8f);
+        isInvincible = false;
     }
-
-    // Calculate dodge target position
-    Vector3 startPosition = transform.position;
-    Vector3 targetPosition = startPosition + dodgeDirection * dodgeDistance;
-
-    // Sync dodge movement to animation duration
-    float dodgeDuration = animator.GetCurrentAnimatorStateInfo(0).length;
-    float elapsedTime = 0f;
-
-    while (elapsedTime < dodgeDuration)
-    {
-        // Lerp position for smooth movement
-        float progress = elapsedTime / dodgeDuration;
-        transform.position = Vector3.Lerp(startPosition, targetPosition, progress);
-
-        elapsedTime += Time.deltaTime;
-        yield return null;
-    }
-
-    // Finalize position and reset states
-    transform.position = targetPosition;
-    isDodging = false;
-
-    yield return new WaitForSeconds(dodgeDuration * 0.8f);
-    isInvincible = false;
-}
 
 
     private void OnDrawGizmos()

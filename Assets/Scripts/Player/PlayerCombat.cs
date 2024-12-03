@@ -105,60 +105,60 @@ public class PlayerCombat : MonoBehaviour
         currentCombo = 0;
     }
 
-    // private void DealDamage()
-    // {
-
-    //     Collider[] hitEnemies = Physics.OverlapSphere(sword.transform.position, attackRange, whatIsEnemy);
-
-    //     //Debug.Log($"Enemy in range: {hitEnemies.Length}");
-    //     HashSet<IDamageable> damagedTargets = new HashSet<IDamageable>();
-
-    //     foreach (Collider target in hitEnemies)
-    //     {
-    //         IDamageable damageable = target.GetComponentInParent<IDamageable>();
-    //         if (damageable != null && !damagedTargets.Contains(damageable))
-    //         {
-    //             damagedTargets.Add(damageable);
-
-    //             damageable.NotifyDamageTaken(attackDamage);
-    //             //Debug.Log($"Dealt {attackDamage} damge to {target.name}");
-    //         }
-    //         else
-    //         {
-    //             //Debug.Log($"No EnemyHealth script found on {target.name}");
-    //         }
-    //     }
-    // }
-
     private void DealDamage()
-{
-    Ray ray = new Ray(sword.transform.position, transform.forward);
-    RaycastHit[] hits = Physics.RaycastAll(ray, attackRange, whatIsEnemy);
-
-    foreach (RaycastHit hit in hits)
     {
-        IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
-        if (damageable != null)
+
+        Collider[] hitEnemies = Physics.OverlapSphere(sword.transform.position, attackRange, whatIsEnemy);
+
+        //Debug.Log($"Enemy in range: {hitEnemies.Length}");
+        HashSet<IDamageable> damagedTargets = new HashSet<IDamageable>();
+
+        foreach (Collider target in hitEnemies)
         {
-            damageable.NotifyDamageTaken(attackDamage);
-            Debug.Log($"Dealt {attackDamage} damage to {hit.collider.name}");
+            IDamageable damageable = target.GetComponentInParent<IDamageable>();
+            if (damageable != null && !damagedTargets.Contains(damageable))
+            {
+                damagedTargets.Add(damageable);
+
+                damageable.NotifyDamageTaken(attackDamage);
+                //Debug.Log($"Dealt {attackDamage} damge to {target.name}");
+            }
+            else
+            {
+                //Debug.Log($"No EnemyHealth script found on {target.name}");
+            }
         }
     }
 
-    if (hits.Length == 0)
-    {
-        Debug.Log("No enemies hit.");
-    }
-}
+    //     private void DealDamage()
+    // {
+    //     Ray ray = new Ray(sword.transform.position, transform.forward);
+    //     RaycastHit[] hits = Physics.RaycastAll(ray, attackRange, whatIsEnemy);
+
+    //     foreach (RaycastHit hit in hits)
+    //     {
+    //         IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+    //         if (damageable != null)
+    //         {
+    //             damageable.NotifyDamageTaken(attackDamage);
+    //             Debug.Log($"Dealt {attackDamage} damage to {hit.collider.name}");
+    //         }
+    //     }
+
+    //     if (hits.Length == 0)
+    //     {
+    //         Debug.Log("No enemies hit.");
+    //     }
+    // }
 
     private void HandleDefense()
     {
-        if (Input.GetMouseButtonDown(1)) // Right Mouse Button
+        if (Input.GetMouseButtonDown(1))
         {
             StartDefense();
         }
 
-        if (Input.GetMouseButton(1)) // Hold defense
+        if (Input.GetMouseButton(1)) 
         {
             if (isDefending && !isInParryWindow)
             {
@@ -166,7 +166,7 @@ public class PlayerCombat : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonUp(1)) // Release defense
+        if (Input.GetMouseButtonUp(1))
         {
             EndDefense();
         }
@@ -242,45 +242,45 @@ public class PlayerCombat : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // Gizmos.color = Color.red;
-        // Gizmos.DrawWireSphere(sword.transform.position, attackRange);
-        // Gizmos.color = Color.red;
-
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(sword.transform.position, attackRange);
         Gizmos.color = Color.red;
 
-        Vector3 rayOrigin = sword.transform.position;
+        // Gizmos.color = Color.red;
 
-        Vector3 centralDirection = transform.forward;
+        // Vector3 rayOrigin = sword.transform.position;
 
-        float sideAngle = 30f;
+        // Vector3 centralDirection = transform.forward;
 
-        Vector3 leftDirection = Quaternion.Euler(0, -sideAngle, 0) * transform.forward;
-        Vector3 rightDirection = Quaternion.Euler(0, sideAngle, 0) * transform.forward;
+        // float sideAngle = 30f;
 
-        Gizmos.DrawRay(rayOrigin, centralDirection * attackRange);
+        // Vector3 leftDirection = Quaternion.Euler(0, -sideAngle, 0) * transform.forward;
+        // Vector3 rightDirection = Quaternion.Euler(0, sideAngle, 0) * transform.forward;
 
-        Gizmos.DrawRay(rayOrigin, leftDirection * attackRange);
+        // Gizmos.DrawRay(rayOrigin, centralDirection * attackRange);
 
-        Gizmos.DrawRay(rayOrigin, rightDirection * attackRange);
+        // Gizmos.DrawRay(rayOrigin, leftDirection * attackRange);
 
-        RaycastHit hit;
+        // Gizmos.DrawRay(rayOrigin, rightDirection * attackRange);
 
-        if (Physics.Raycast(rayOrigin, centralDirection, out hit, attackRange, whatIsEnemy))
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
-        }
+        // RaycastHit hit;
 
-        if (Physics.Raycast(rayOrigin, leftDirection, out hit, attackRange, whatIsEnemy))
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
-        }
+        // if (Physics.Raycast(rayOrigin, centralDirection, out hit, attackRange, whatIsEnemy))
+        // {
+        //     Gizmos.color = Color.green;
+        //     Gizmos.DrawSphere(hit.point, 0.2f); 
+        // }
 
-        if (Physics.Raycast(rayOrigin, rightDirection, out hit, attackRange, whatIsEnemy))
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(hit.point, 0.2f); // Đánh dấu vị trí va chạm
-        }
-        }
+        // if (Physics.Raycast(rayOrigin, leftDirection, out hit, attackRange, whatIsEnemy))
+        // {
+        //     Gizmos.color = Color.green;
+        //     Gizmos.DrawSphere(hit.point, 0.2f); 
+        // }
+
+        // if (Physics.Raycast(rayOrigin, rightDirection, out hit, attackRange, whatIsEnemy))
+        // {
+        //     Gizmos.color = Color.green;
+        //     Gizmos.DrawSphere(hit.point, 0.2f);
+        // }
+    }
 }
