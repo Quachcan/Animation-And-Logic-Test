@@ -733,7 +733,6 @@ GameObject:
   - component: {fileID: 1172698598784218568}
   - component: {fileID: 3244398631169251653}
   - component: {fileID: 3631624735524479749}
-  - component: {fileID: 3474431549396262695}
   m_Layer: 3
   m_Name: Sword_R001
   m_TagString: Untagged
@@ -806,27 +805,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3474431549396262695
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2280061550345416623}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.22409225, y: 0.04094283, z: 1.7115713}
-  m_Center: {x: -0.044635314, y: 0.000000021099872, z: -0.55815387}
 --- !u!1 &2467215608370485273
 GameObject:
   m_ObjectHideFlags: 0

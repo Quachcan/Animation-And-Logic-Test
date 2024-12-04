@@ -21,10 +21,9 @@ public class EnemyCombat : MonoBehaviour
     {
         animator = GetComponentInChildren<Animator>();
         lastComboTime = -float.MaxValue;
-        PerformRandomCombo();
     }
 
-    private void DealDamage()
+    public void DealDamage()
     {
         Collider[] hitPlayer = Physics.OverlapSphere(sword.transform.position, attackRange, whatIsPlayer);
         Debug.Log($"Player in range: {hitPlayer.Length}");
@@ -54,7 +53,6 @@ public class EnemyCombat : MonoBehaviour
         {
             if (combos.Count > 0)
             {
-
                 Combo randomCombo = combos[Random.Range(0, combos.Count)];
                 StartCoroutine(ExecuteCombo(randomCombo));
 

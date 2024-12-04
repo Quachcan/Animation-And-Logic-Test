@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -9,6 +9,9 @@ public class EnemyAI : MonoBehaviour
     public Transform player;
     public LayerMask whatIsGround, whatIsPlayer;
     private Enemy enemy;
+    private AnimationManager animationManager;
+    private Animator animator;
+    private EnemyCombat enemyCombat;
 
     [Header("Patrolling")]
     public Vector3 walkPoint;
@@ -27,6 +30,11 @@ public class EnemyAI : MonoBehaviour
     {
         player = GameObject.Find("Player").transform;
         agent = GetComponentInParent<NavMeshAgent>();
+        animator = GetComponentInChildren<Animator>();
+        animationManager = new AnimationManager(animator);
+        enemyCombat = GetComponentInChildren<EnemyCombat>();
+        agent.stoppingDistance = attackRange - 1f;
+        attackRange = enemyCombat.attackRange;
     }
 
     void Update()
@@ -38,13 +46,17 @@ public class EnemyAI : MonoBehaviour
         {
             Patrolling();
         }
-        if (isPlayerInSightRange && !isPlayerInAttackRange)
+        else if (isPlayerInSightRange && !isPlayerInAttackRange)
         {
             Chasing();
         }
-        if (isPlayerInSightRange && isPlayerInAttackRange)
+        else if (isPlayerInSightRange && isPlayerInAttackRange)
         {
             Attacking();
+        }
+        else
+        {
+            Idle();
         }
     }
 
@@ -53,6 +65,9 @@ public class EnemyAI : MonoBehaviour
         if(!walkPointSet)
         {
             SearchWalkPoints();
+            animationManager.SetBool("IsWalking", true);
+            animationManager.SetBool("IsRunning", false);
+            agent.speed = 1f;
         }
         if(walkPointSet)
         {
@@ -82,21 +97,54 @@ public class EnemyAI : MonoBehaviour
 
     private void Chasing()
     {
-        agent.SetDestination(player.position);
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        if (distanceToPlayer > attackRange)
+        {
+            agent.SetDestination(player.position);
+            animationManager.SetBool("IsRunning", true);
+            animationManager.SetBool("IsWalking", false);
+            agent.speed = 4.5f;
+        }
+        else
+        {
+            agent.ResetPath();
+            animationManager.SetBool("IsRunning", false);
+        }
     }
 
     private void Attacking()
     {
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        agent.SetDestination(player.position);
+        if (distanceToPlayer <= attackRange)
+        {
+            agent.SetDestination(transform.position);
+        }
+        else
+        {
+            agent.ResetPath();
+        }
 
-        transform.LookAt(player);
+        Vector3 direction = (player.position - transform.position).normalized;
+        direction.y = 0;
+        transform.rotation = Quaternion.LookRotation(direction);
 
-        if(!alreadyAttacked)
+        if (!alreadyAttacked)
         {
             alreadyAttacked = true;
+
+            enemyCombat.PerformRandomCombo();
+
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
+    }
+    private void Idle()
+    {
+        agent.ResetPath();
+        animationManager.SetBool("IsWalking", false);
+        animationManager.SetBool("IsRunning", false);
+        agent.speed = 0f;
     }
 
     private void ResetAttack()
@@ -104,10 +152,6 @@ public class EnemyAI : MonoBehaviour
         alreadyAttacked = false;
     }
 
-    private void DealDamage()
-    {
-
-    }
 
     private void OnDrawGizmos()
     {

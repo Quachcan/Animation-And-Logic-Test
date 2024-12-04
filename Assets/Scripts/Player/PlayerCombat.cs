@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
@@ -10,6 +11,7 @@ public class PlayerCombat : MonoBehaviour
     public float attackDamage;
     private bool canAttack = true;
     public LayerMask whatIsEnemy;
+    //private bool isAttacking = false;
 
     [Header("Combo System")]
     public int maxCombo = 3;
@@ -43,11 +45,13 @@ public class PlayerCombat : MonoBehaviour
 
     [Header("Components")]
     private AnimationManager animationManager;
+    private PlayerMovement playerMovement;
 
     private void Awake()
     {
         animator = GetComponentInChildren<Animator>();
         animationManager = new AnimationManager(animator);
+        playerMovement = GetComponentInChildren<PlayerMovement>();
     }
 
     private void Update()
@@ -71,6 +75,7 @@ public class PlayerCombat : MonoBehaviour
 
     private void PerformComboAttack()
     {
+        if(!canAttack || playerMovement.isActionLocked) return;
         Debug.Log($"Current Combo: {currentCombo}");
         foreach (string trigger in comboTriggers)
         {
@@ -91,8 +96,11 @@ public class PlayerCombat : MonoBehaviour
 
         lastAttackTime = Time.time;
 
+        playerMovement.isActionLocked = true;
+
         canAttack = false;
         Invoke(nameof(ResetAttack), attackCooldown);
+        Invoke(nameof(UnlockAction), attackCooldown);
     }
 
     private void ResetAttack()
@@ -103,6 +111,11 @@ public class PlayerCombat : MonoBehaviour
     private void ResetCombo()
     {
         currentCombo = 0;
+    }
+
+    private void UnlockAction()
+    {
+        playerMovement.isActionLocked = false;
     }
 
     private void DealDamage()
@@ -130,27 +143,6 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
-    //     private void DealDamage()
-    // {
-    //     Ray ray = new Ray(sword.transform.position, transform.forward);
-    //     RaycastHit[] hits = Physics.RaycastAll(ray, attackRange, whatIsEnemy);
-
-    //     foreach (RaycastHit hit in hits)
-    //     {
-    //         IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
-    //         if (damageable != null)
-    //         {
-    //             damageable.NotifyDamageTaken(attackDamage);
-    //             Debug.Log($"Dealt {attackDamage} damage to {hit.collider.name}");
-    //         }
-    //     }
-
-    //     if (hits.Length == 0)
-    //     {
-    //         Debug.Log("No enemies hit.");
-    //     }
-    // }
-
     private void HandleDefense()
     {
         if (Input.GetMouseButtonDown(1))
@@ -177,6 +169,7 @@ public class PlayerCombat : MonoBehaviour
         if (isDefending) return;
 
         isDefending = true;
+        playerMovement.isActionLocked = true;
         isInParryWindow = true; // Enable parry window
         defenseStartTime = Time.time;
 
@@ -201,7 +194,9 @@ public class PlayerCombat : MonoBehaviour
     private void EndDefense()
     {
         isDefending = false;
-        animationManager.StopDefense(); // Stop all defense animations
+        //isAttacking = false;
+        playerMovement.isActionLocked = false;
+        animationManager.StopDefense();
     }
 
     public void TryParry(bool enemyAttackDetected)
@@ -246,41 +241,5 @@ public class PlayerCombat : MonoBehaviour
         Gizmos.DrawWireSphere(sword.transform.position, attackRange);
         Gizmos.color = Color.red;
 
-        // Gizmos.color = Color.red;
-
-        // Vector3 rayOrigin = sword.transform.position;
-
-        // Vector3 centralDirection = transform.forward;
-
-        // float sideAngle = 30f;
-
-        // Vector3 leftDirection = Quaternion.Euler(0, -sideAngle, 0) * transform.forward;
-        // Vector3 rightDirection = Quaternion.Euler(0, sideAngle, 0) * transform.forward;
-
-        // Gizmos.DrawRay(rayOrigin, centralDirection * attackRange);
-
-        // Gizmos.DrawRay(rayOrigin, leftDirection * attackRange);
-
-        // Gizmos.DrawRay(rayOrigin, rightDirection * attackRange);
-
-        // RaycastHit hit;
-
-        // if (Physics.Raycast(rayOrigin, centralDirection, out hit, attackRange, whatIsEnemy))
-        // {
-        //     Gizmos.color = Color.green;
-        //     Gizmos.DrawSphere(hit.point, 0.2f); 
-        // }
-
-        // if (Physics.Raycast(rayOrigin, leftDirection, out hit, attackRange, whatIsEnemy))
-        // {
-        //     Gizmos.color = Color.green;
-        //     Gizmos.DrawSphere(hit.point, 0.2f); 
-        // }
-
-        // if (Physics.Raycast(rayOrigin, rightDirection, out hit, attackRange, whatIsEnemy))
-        // {
-        //     Gizmos.color = Color.green;
-        //     Gizmos.DrawSphere(hit.point, 0.2f);
-        // }
     }
 }

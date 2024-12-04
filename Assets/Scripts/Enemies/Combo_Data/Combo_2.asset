@@ -17,4 +17,4 @@ MonoBehaviour:
   - Attack_2
   - Attack_1
   comboTime: 0.5
-  comboCoolDownTime: 1.5
+  comboCoolDownTime: 2

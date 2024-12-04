@@ -26,6 +26,10 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask whatIsGround;
     bool grounded;
 
+    private bool isAttacking;
+    private bool isDefending;
+    public bool isActionLocked = false;
+
     public Transform orientation;
 
     float horizontalInput;
@@ -46,6 +50,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if(isActionLocked) return;
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
         MovementInput();
@@ -96,6 +101,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
+
+        if(isActionLocked || isDodging) return; 
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
 
@@ -140,6 +147,8 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator PerformDodge()
     {
+        //if(isAttacking || isDefending) yield break;
+
         isDodging = true;
         isInvincible = true;
 
