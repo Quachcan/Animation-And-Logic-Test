@@ -9,7 +9,9 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     public float maxHealth;
     public float maxPostureHealth;
     public float currentHealth;
-    private float currentPostureHealth;
+    public float currentPostureHealth;
+    public float postureRecoveryRate =5f;
+    public bool isStunned = false;
 
 
     private Animator animator;
@@ -18,14 +20,21 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     {
         animator = GetComponentInChildren<Animator>();
         currentHealth = maxHealth;
-        currentPostureHealth = maxPostureHealth;
+        currentPostureHealth = 0f;
+    }
+
+    void Update()
+    {
+        RecoverFromStun();
+        RecoverPosture();
     }
 
     public void TakeDamage(float amount)
     {
-        currentHealth -= amount/1.5f;
+        currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        currentPostureHealth -= amount;
+
+        IncreasePosture(amount / 2);
 
         //Todo: Blood effect
 
@@ -33,6 +42,33 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         {
             Die();
         }
+    }
+
+        public void IncreasePosture(float amount)
+    {
+        currentPostureHealth += amount;
+        currentPostureHealth = Mathf.Clamp(currentPostureHealth, 0, maxPostureHealth);
+
+        if (currentPostureHealth >= maxPostureHealth)
+        {
+            GetComponent<EnemyCombat>().Stun(1.5f);
+            isStunned = true;
+            currentPostureHealth = 0; 
+        }
+    }
+
+        private void RecoverPosture()
+    {
+        if (currentPostureHealth > 0f)
+        {
+            currentPostureHealth -= postureRecoveryRate * Time.deltaTime;
+            currentPostureHealth = Mathf.Clamp(currentPostureHealth, 0f, maxPostureHealth);
+        }
+    }
+
+    public void RecoverFromStun()
+    {
+        isStunned = false;
     }
     public void NotifyDamageTaken(float amount)
     {

@@ -750,7 +750,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 37.84, y: 1.183, z: -44.04}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1637512118235869587}
@@ -781,6 +781,7 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
+  isActionLocked: 0
   orientation: {fileID: 8870950612034151156}
 --- !u!54 &203359291525749424
 Rigidbody:
@@ -821,13 +822,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4926980783600415fb0cff73d67731b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isInCombat: 0
   attackCooldown: 1
   attackRange: 20
   attackDamage: 20
   whatIsEnemy:
     serializedVersion: 2
     m_Bits: 8
+  maxCombo: 3
   deflectCoolDown: 0.1
   deflectWindown: 0.3
   deflectEffect: {fileID: 0}

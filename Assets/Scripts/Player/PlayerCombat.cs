@@ -9,9 +9,12 @@ public class PlayerCombat : MonoBehaviour
     public float attackCooldown = 1f; 
     public float attackRange;
     public float attackDamage;
-    private bool canAttack = true;
     public LayerMask whatIsEnemy;
-    //private bool isAttacking = false;
+    public bool isAttacking = false;
+    private bool canAttack = true;
+
+    private bool isStunned;
+    private float stunTimer;
 
     [Header("Combo System")]
     public int maxCombo = 3;
@@ -27,7 +30,7 @@ public class PlayerCombat : MonoBehaviour
     private bool isDefending = false;
 
     [Header("Parry System")]
-    private bool canDeflect = true;
+    //private bool canDeflect = true;
     public float deflectCoolDown = 0.1f;
     public float deflectWindown = 0.3f;
     public GameObject deflectEffect;
@@ -89,6 +92,8 @@ public class PlayerCombat : MonoBehaviour
             currentCombo = 1;
         }
 
+        isAttacking = true;
+
         DealDamage();
 
         string triggerToActivate = comboTriggers[currentCombo - 1];
@@ -101,6 +106,12 @@ public class PlayerCombat : MonoBehaviour
         canAttack = false;
         Invoke(nameof(ResetAttack), attackCooldown);
         Invoke(nameof(UnlockAction), attackCooldown);
+        Invoke(nameof(ResetAttacking), attackCooldown);
+    }
+
+    private void ResetAttacking()
+    {
+        isAttacking = false;
     }
 
     private void ResetAttack()
@@ -221,6 +232,12 @@ public class PlayerCombat : MonoBehaviour
         animationManager.SetParryIndex(parryIndex);
         animationManager.TriggerParryReaction();
 
+        EnemyHealth enemyHealth = GetComponentInParent<EnemyHealth>();
+        if (enemyHealth != null)
+        {
+            enemyHealth.IncreasePosture(20f);
+        }
+
         if (deflectEffect != null)
         {
             Instantiate(deflectEffect, transform.position, Quaternion.identity);
@@ -233,6 +250,18 @@ public class PlayerCombat : MonoBehaviour
     {
         animationManager.PlayTrigger("DefenseHit");
         Debug.Log("Parry Failed! Playing Defend Hit Animation.");
+        GetComponent<PlayerHealth>().IncreasePosture(20f);
+    }
+
+    public void Stun(float duration)
+    {
+        if(isStunned) return;
+
+        isStunned = true;
+        stunTimer = duration;
+        animator.SetTrigger("Stunned");
+        playerMovement.isActionLocked = true;
+        Debug.Log("Player is stunned!");
     }
 
     private void OnDrawGizmos()

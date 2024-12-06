@@ -12,15 +12,29 @@ public class EnemyCombat : MonoBehaviour
     public float attackDamage;
     public float attackRange;
     public LayerMask whatIsPlayer;
+    public bool isStunned = false;
+    private float stunTimer;
 
     public GameObject sword;
+    private EnemyAI_BT enemyAI;
 
     private Animator animator;
 
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
+        enemyAI = GetComponent<EnemyAI_BT>();
         lastComboTime = -float.MaxValue;
+    }
+
+    private void Update()
+    {
+        if (isStunned)
+        {
+            stunTimer -= Time.deltaTime;
+            enemyAI.isActionLocked = false;
+            Debug.Log("Enemy recover from stun");
+        }
     }
 
     public void DealDamage()
@@ -74,6 +88,22 @@ public class EnemyCombat : MonoBehaviour
 
         yield return new WaitForSeconds(combo.comboCoolDownTime);
     }
+
+    private void Parry()
+    {
+        animator.SetTrigger("Parry");
+
+    }
+    public void Stun(float duration)
+{
+    if (isStunned) return;
+
+    isStunned = true;
+    stunTimer = duration;
+    animator.SetTrigger("Stunned");
+    enemyAI.isActionLocked = true;
+    Debug.Log("Enemy is stunned!");
+}
 
     private void OnDrawGizmos()
     {

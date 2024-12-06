@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Dodging")]
     public float dodgeDistance;
     private bool isDodging;
-    private bool isInvincible;
+    //private bool isInvincible;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -150,7 +150,7 @@ public class PlayerMovement : MonoBehaviour
         //if(isAttacking || isDefending) yield break;
 
         isDodging = true;
-        isInvincible = true;
+        //isInvincible = true;
 
         animator.SetTrigger("Dodge");
 
@@ -184,7 +184,7 @@ public class PlayerMovement : MonoBehaviour
         isDodging = false;
 
         yield return new WaitForSeconds(dodgeDuration * 0.8f);
-        isInvincible = false;
+        //isInvincible = false;
     }
 
 

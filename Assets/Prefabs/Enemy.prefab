@@ -1519,6 +1519,8 @@ GameObject:
   - component: {fileID: 3322441711367584067}
   - component: {fileID: 6077207207744233596}
   - component: {fileID: 4582452616078920113}
+  - component: {fileID: 3460342494937241414}
+  - component: {fileID: 4012190383282770871}
   m_Layer: 3
   m_Name: Enemy
   m_TagString: Enemy
@@ -1536,7 +1538,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 38.9, y: 2.1263154, z: -38.34}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6012183565066686}
@@ -1571,6 +1573,53 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockOnTarget: {fileID: 7669855178320153192}
+--- !u!114 &3460342494937241414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6216513294555407897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97763e01ffc3a4d13b4d16a38a174617, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 0}
+  player: {fileID: 0}
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 64
+  whatIsPlayer:
+    serializedVersion: 2
+    m_Bits: 128
+  walkPoint: {x: 0, y: 0, z: 0}
+  walkPointRange: 12
+  timeBetweenAttacks: 0.5
+  sightRange: 15
+  attackRange: 0
+--- !u!114 &4012190383282770871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6216513294555407897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6609a5540f823dc44a0f26a9939bfd02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  combos:
+  - {fileID: 11400000, guid: 908d81a3fe0eade498355259412cdfa8, type: 2}
+  - {fileID: 11400000, guid: 1c29a9008e2cf554fba326fc9cef1bad, type: 2}
+  - {fileID: 11400000, guid: 6f0173343242b92488a8b7fadae2c8fe, type: 2}
+  attackDamage: 30
+  attackRange: 1.4
+  whatIsPlayer:
+    serializedVersion: 2
+    m_Bits: 128
+  sword: {fileID: 2280061550345416623}
 --- !u!1 &6276910731164809637
 GameObject:
   m_ObjectHideFlags: 0
@@ -2312,15 +2361,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9068518219329887362}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: -0.8994093, y: -2.1262162, z: 0.56782484}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1153810175518759020}
   - {fileID: 8118295086806243019}
   m_Father: {fileID: 3322441711367584067}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &2456873289433541936
 Animator:
   serializedVersion: 5
